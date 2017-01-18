@@ -31,14 +31,15 @@ namespace SignalTest.Hubs
         {
             var command = context.Database.Connection.CreateCommand();
             command.CommandType = CommandType.Text;
-            command.CommandText = "SELECT * FROM dbo.DummyInformations";
+            command.CommandText = "SELECT Id, Information FROM dbo.DummyInformations";
             var dep = new SqlDependency(command as SqlCommand);
             dep.OnChange += Changed;
             if (command.Connection.State != ConnectionState.Open)
             {
                 command.Connection.Open();
             }
-            command.ExecuteReader();
+            var dr = command.ExecuteReader();
+            dr.Dispose();
         }
 
         private void Changed(object sender, SqlNotificationEventArgs e)
@@ -48,6 +49,13 @@ namespace SignalTest.Hubs
                 var data = new DataStore().RefreshData();
                 _uptimeHub.Clients.All.refreshData(data);
             }
+
+            var dependency = sender as SqlDependency;
+            if (dependency != null)
+            {
+                dependency.OnChange -= Changed;
+            }
+            InitSqlDependency();
         }
 
         public void Stop(bool immediate)
