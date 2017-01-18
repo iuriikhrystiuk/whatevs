@@ -24,7 +24,7 @@ namespace SignalTest.Hubs
 
         private void StartTimer()
         {
-            _timer = new Timer(BroadcastUptimeToClients, null, 0, 10000);
+            _timer = new Timer(BroadcastUptimeToClients, null, 0, 30000);
         }
 
         private void BroadcastUptimeToClients(object state)

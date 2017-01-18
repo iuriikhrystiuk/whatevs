@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNet.SignalR;
+﻿using System.Data.Entity;
+using Microsoft.AspNet.SignalR;
 using Microsoft.Owin;
 using Owin;
+using SignalTest.Context;
 using SignalTest.Hubs;
+using SignalTest.Migrations;
 
 [assembly: OwinStartup(typeof(SignalTest.Startup))]
 namespace SignalTest
@@ -17,6 +20,8 @@ namespace SignalTest
             };
             app.MapSignalR("/signalr", hubConfiguration);
             new RefreshDataTimer();
+            new RefreshThroughSqlDependency();
+            Database.SetInitializer(new DropCreateDatabaseAlways<RefreshDataContext>());
         }
     }
 }
