@@ -1,4 +1,5 @@
 ﻿using System.Data.Entity;
+using System.Web.Configuration;
 using Microsoft.AspNet.SignalR;
 using Microsoft.Owin;
 using Owin;
@@ -13,6 +14,12 @@ namespace SignalTest
     {
         public void Configuration(IAppBuilder app)
         {
+            var populateDb = bool.Parse(WebConfigurationManager.AppSettings["populatedb"]);
+            if (populateDb)
+            {
+                Database.SetInitializer(new MigrateDatabaseToLatestVersion<RefreshDataContext, Configuration>());
+            }
+
             // Any connection or hub wire up and configuration should go here
             var hubConfiguration = new HubConfiguration
             {
@@ -21,7 +28,6 @@ namespace SignalTest
             app.MapSignalR("/signalr", hubConfiguration);
             new RefreshDataTimer();
             new RefreshThroughSqlDependency();
-            Database.SetInitializer(new DropCreateDatabaseAlways<RefreshDataContext>());
         }
     }
 }
